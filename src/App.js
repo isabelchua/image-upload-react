@@ -12,6 +12,12 @@ function App() {
 		previewFile(file);
 	};
 
+	const handleSubmitFile = e => {
+		e.preventDefault();
+		if (!preview) return;
+		uploadImage(preview);
+	};
+
 	const previewFile = file => {
 		const reader = new FileReader();
 		reader.readAsDataURL(file);
@@ -19,10 +25,24 @@ function App() {
 			setPreview(reader.result);
 		};
 	};
+
+	const uploadImage = async base64EncodedImage => {
+		console.log(base64EncodedImage);
+		try {
+			await fetch("/api/upload", {
+				method: "POST",
+				body: JSON.stringify({ data: base64EncodedImage }),
+				headers: { "Content-type": "application/json" }
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	return (
 		<div className="App">
 			<h1>Upload</h1>
-			<form>
+			<form onSubmit={handleSubmitFile} className="form">
 				<input
 					type="file"
 					name="image"
@@ -31,7 +51,7 @@ function App() {
 					className="form-input"
 					id=""
 				/>
-				<button className="btn" type="button">
+				<button className="btn" type="submit">
 					Submit
 				</button>
 			</form>
